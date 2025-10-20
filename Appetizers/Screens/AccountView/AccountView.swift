@@ -8,39 +8,52 @@
 import SwiftUI
 
 struct AccountView: View {
-    @State private var firstName = ""
-    @State private var lastName = ""
-    @State private var email = ""
-    @State private var birthdate = Date()
-    @State private var extraNapkins = false
-    @State private var frequentRefills = false
+    
+    @StateObject var viewModel = AccountViewModel()
+    
+    private var isShowingAlert: Binding<Bool> {
+        Binding(
+            get: { viewModel.alertItem != nil },
+            set: { _ in viewModel.alertItem = nil }
+        )
+    }
+    
     var body: some View {
         NavigationView{
             Form{
                 Section(header: Text("Personal Info")){
-                    TextField("First Name", text: $firstName)
-                    TextField("Last name", text: $lastName)
-                    TextField("Email", text: $email)
+                    TextField("First Name", text: $viewModel.firstName)
+                    TextField("Last name", text: $viewModel.lastName)
+                    TextField("Email", text: $viewModel.email)
                         .keyboardType(.emailAddress)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled(true)
-                    DatePicker("Birthday", selection: $birthdate, displayedComponents: .date)
+                    DatePicker("Birthday", selection: $viewModel.birthdate, displayedComponents: .date)
                     
                     Button{
-                        print("save")
+                        viewModel.saveChanges()
                     }label: {
                         Text("Save Changes")
                     }
                 }
                 
                 Section(header: Text("Requests")){
-                    Toggle("Extra Napkins", isOn: $extraNapkins)
-                    Toggle("Frequent Refills", isOn: $frequentRefills)
+                    Toggle("Extra Napkins", isOn: $viewModel.extraNapkins)
+                    Toggle("Frequent Refills", isOn: $viewModel.frequentRefills)
                 }
                 .tint(.brandPrimary)
             }
-                .navigationTitle("⚙️ Account")
-        }    }
+            .navigationTitle("⚙️ Account")
+        }
+        .alert(viewModel.alertItem?.title ?? Text("Alert"),
+               isPresented: isShowingAlert){
+            Button(viewModel.alertItem?.dismissButtonTitle ?? "OK"){
+                viewModel.alertItem = nil
+            }
+        }message: {
+            viewModel.alertItem?.message ?? Text("")
+        }
+    }
 }
 
 #Preview {
