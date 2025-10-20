@@ -8,32 +8,35 @@
 import SwiftUI
 
 struct AppetizerListView: View {
+
+    @StateObject var viewModel = AppetizerListViewModel()
     
-    @State private var appetizers: [Appetizer] = []
+    private var isShowingAlert: Binding<Bool> {
+            Binding(
+                get: { viewModel.alertItem != nil },
+                set: { _ in viewModel.alertItem = nil }
+            )
+        }
     
     var body: some View {
         NavigationView{
-            List(appetizers){ appetizer in
+            List(viewModel.appetizers){ appetizer in
                 AppetizerListCell(appetizer: appetizer)
             }
             .navigationTitle("🍟 Appetizers")
         }
         .onAppear{
-            getAppetizers()
+            viewModel.getAppetizers()
         }
-    }
-    
-    func getAppetizers(){
-        NetworkManager.shared.getAppetizers { result in
-            DispatchQueue.main.async {
-                switch result{
-                case .success(let appetizers ):
-                    self.appetizers = appetizers
-                case .failure(let error):
-                    print(error.localizedDescription)
-                }
+        .alert(viewModel.alertItem?.title ?? Text("Alert"),
+               isPresented: isShowingAlert){
+            Button(viewModel.alertItem?.dismissButtonTitle ?? "OK"){
+                viewModel.alertItem = nil
             }
+        }message: {
+            viewModel.alertItem?.message ?? Text("")
         }
+        
     }
 }
 
