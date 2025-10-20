@@ -8,25 +8,30 @@
 import SwiftUI
 
 struct AppetizerListView: View {
-
+    
     @StateObject var viewModel = AppetizerListViewModel()
     
     private var isShowingAlert: Binding<Bool> {
-            Binding(
-                get: { viewModel.alertItem != nil },
-                set: { _ in viewModel.alertItem = nil }
-            )
-        }
+        Binding(
+            get: { viewModel.alertItem != nil },
+            set: { _ in viewModel.alertItem = nil }
+        )
+    }
     
     var body: some View {
-        NavigationView{
-            List(viewModel.appetizers){ appetizer in
-                AppetizerListCell(appetizer: appetizer)
+        ZStack{
+            NavigationView{
+                List(viewModel.appetizers){ appetizer in
+                    AppetizerListCell(appetizer: appetizer)
+                }
+                .navigationTitle("🍟 Appetizers")
             }
-            .navigationTitle("🍟 Appetizers")
-        }
-        .onAppear{
-            viewModel.getAppetizers()
+            .onAppear{
+                viewModel.getAppetizers()
+            }
+            if viewModel.isLoading{
+                LoadingView()
+            }
         }
         .alert(viewModel.alertItem?.title ?? Text("Alert"),
                isPresented: isShowingAlert){
@@ -36,7 +41,6 @@ struct AppetizerListView: View {
         }message: {
             viewModel.alertItem?.message ?? Text("")
         }
-        
     }
 }
 
