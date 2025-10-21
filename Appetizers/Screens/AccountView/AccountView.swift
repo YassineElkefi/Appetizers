@@ -24,7 +24,7 @@ struct AccountView: View {
     }
     
     var body: some View {
-        NavigationView{
+        NavigationStack{
             Form{
                 Section(header: Text("Personal Info")){
                     TextField("First Name", text: $viewModel.user.firstName)
