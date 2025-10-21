@@ -8,11 +8,33 @@
 import SwiftUI
 
 struct OrderView: View {
+    
+    @State private var orderItems = MockData.orderItems
+    
     var body: some View {
         NavigationView{
-            Text("Orders")
-                .navigationTitle("🧾 Orders")
-        }    }
+            VStack{
+                List{
+                    ForEach(orderItems){ appetizer in
+                        AppetizerListCell(appetizer: appetizer)
+                    }
+                    .onDelete(perform: deleteItems)
+                }
+                
+                Button{
+                    print("Order Placed")
+                }label: {
+                    APButton(title: "20.99 TND - Place Order")
+                }
+                .padding(.bottom, 25)
+            }
+            .navigationTitle("🧾 Orders")
+        }
+    }
+    
+    func deleteItems(at offsets: IndexSet){
+        orderItems.remove(atOffsets: offsets)
+    }
 }
 
 #Preview {
