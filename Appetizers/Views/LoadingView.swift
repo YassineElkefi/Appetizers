@@ -11,7 +11,7 @@ struct LoadingView: View {
     var body: some View {
         //Large Spinner with different coloring
         ZStack {
-            Color.white
+            Color(.systemBackground)
                 .ignoresSafeArea()
             ProgressView()
                 .tint(.brandPrimary)
