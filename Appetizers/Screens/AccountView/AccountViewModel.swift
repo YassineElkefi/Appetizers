@@ -9,32 +9,46 @@ import SwiftUI
 import Combine
 
 final class AccountViewModel: ObservableObject{
-   @Published var firstName = ""
-   @Published var lastName = ""
-   @Published var email = ""
-   @Published var birthdate = Date()
-   @Published var extraNapkins = false
-   @Published var frequentRefills = false
+    
+    @AppStorage("user") private var userData: Data?
+    @Published var user = User()
     @Published var alertItem: AlertItem?
     
-   var isValidForm: Bool{
-       guard !firstName.isEmpty && !lastName.isEmpty && !email.isEmpty else{
-           alertItem = AlertContext.invalidForm
-           return false
-       }
+    func saveChanges(){
+        guard isValidForm else{ return }
         
-       guard email.isValidEmail else{
-           alertItem = AlertContext.invalidEmail
-           return false
-       }
-       
-       return true
+        do{
+            let data = try JSONEncoder().encode(user)
+            userData = data
+            alertItem = AlertContext.userSaveSucess
+        }catch{
+            alertItem = AlertContext.userSaveFailed
+        }
     }
     
-    func saveChanges(){
-        guard isValidForm else{
-            return
+    func retrieveUser(){
+        guard let userData = userData else { return }
+        
+        do{
+            user = try JSONDecoder().decode(User.self, from: userData)
+        }catch{
+            alertItem = AlertContext.userSaveFailed
         }
-        print("Changes Saved")
     }
+    
+    var isValidForm: Bool{
+        guard !user.firstName.isEmpty && !user.lastName.isEmpty && !user.email.isEmpty else{
+            alertItem = AlertContext.invalidForm
+            return false
+        }
+        
+        guard user.email.isValidEmail else{
+            alertItem = AlertContext.invalidEmail
+            return false
+        }
+        
+        return true
+    }
+    
+    
 }
