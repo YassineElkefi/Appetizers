@@ -17,7 +17,7 @@ struct AppetizerTabView: View {
                 AccountView()
             }
             Tab("Order", systemImage: "bag"){
-                AppetizerListView()
+                OrderView()
             }
         }
         .tint(.brandPrimary)
